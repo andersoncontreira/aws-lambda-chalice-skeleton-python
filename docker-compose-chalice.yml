@@ -1,0 +1,18 @@
+version: "3.2"
+services:
+    chalice-service:
+        build:
+            dockerfile: ./environment/chalice/Dockerfile
+            context: .
+            args:
+              projectName: project-name-chalice
+        command: [ "chalice", "local", "--host", "0.0.0.0" ]
+        image: project-name-chalice:latest
+        container_name: project-name-chalice
+        privileged: true
+        ports:
+            - 8000:8000
+        networks:
+            - default
+        volumes:
+            - .:/project-name-chalice

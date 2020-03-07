@@ -1,0 +1,26 @@
+.idea
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+var
+sdist
+develop-eggs
+.installed.cfg
+
+# Pyenv
+.python-version
+
+# Virtual env
+venv
+
+# Project details
+.chalice/deployments/
+.chalice/venv/
+
+# ignore vendor
+vendor/*
+infrastructure/.terraform

@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "app_name": "app-name",
+  "tags" : {
+    "Sector":"Sector Name",
+    "Team":"Team Name",
+    "App":"App Name"
+  },
+  "lambda_timeout": 40,
+  "stages": {
+    "dev": {
+      "manage_iam_role" : false,
+      "type" : "api",
+      "api_gateway_stage": "api"
+    }
+  }
+}
