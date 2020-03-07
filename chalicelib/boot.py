@@ -2,6 +2,7 @@ import os
 import sys
 
 from dotenv import load_dotenv
+from chalicelib.config import get_config
 
 if __package__:
     current_path = os.path.abspath(os.path.dirname(__file__)).replace('/' + str(__package__), '', 1)
