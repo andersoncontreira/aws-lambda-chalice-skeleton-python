@@ -1,5 +1,5 @@
-# Project Name Chalice 
-Micro service created with chalice to ....
+# Aws Lambda Chalice Skeleton for python 
+Skeleton to create microservices using Chalice and Lambda.
 
 ## Release notes 
 
