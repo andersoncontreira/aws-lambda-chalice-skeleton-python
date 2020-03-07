@@ -12,8 +12,11 @@ In this section contains the release notes of the project.
 All the changes must be tracked in [CHANGELOG.md](CHANGELOG.md)
 
 ## Features
- * (HTTP) RESTful service;
+ * Basic RESTful structure;;
  * Docker to development environment;
+ * Binaries commands to automatize some actions;
+ * Environment variables support;
+ * Unit and Functional tests structure;
  
 
 ## Installing
