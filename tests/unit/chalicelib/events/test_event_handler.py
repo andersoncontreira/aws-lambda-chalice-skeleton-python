@@ -3,7 +3,7 @@ import unittest
 
 from unittest_data_provider import data_provider
 
-from chalicelib.enums import EventType
+from chalicelib.enums.events import EventType
 from chalicelib.events import EventHandler
 from tests.functional.functionaltestutils import ROOT_DIR
 from tests.unit.testutils import BaseUnitTest
@@ -36,7 +36,6 @@ class EventHandlerTestCase(BaseUnitTest):
         result = EventHandler.sqs(EventType.QUOTATION, event)
         self.logger.info(result)
         self.assertIsNotNone(result)
-
 
 if __name__ == '__main__':
     unittest.main()

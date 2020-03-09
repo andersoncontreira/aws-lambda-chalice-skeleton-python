@@ -1,5 +1,5 @@
 from chalicelib.commands import QuotationCommand
-from chalicelib.enums import EventType
+from chalicelib.enums.events import EventType
 from chalicelib.events.sqs import SQSEventHandler
 
 

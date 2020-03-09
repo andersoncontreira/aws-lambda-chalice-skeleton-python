@@ -9,7 +9,7 @@ load_providers()
 
 # imports
 from chalicelib.events import EventHandler
-from chalicelib.enums import EventType
+from chalicelib.enums.events import EventType
 from chalicelib.http.controllers.api import ApiController
 from chalicelib.logging import get_logger
 from chalicelib import APP_NAME, helper
@@ -52,9 +52,9 @@ def handle_sqs_message(event):
     return EventHandler.sqs(EventType.QUOTATION, event)
 
 
-@app.schedule(Rate(1, unit=Rate.HOURS))
-def every_hour(event):
-    return EventHandler.cw(EventType.QUOTATION, event)
+# @app.schedule(Rate(1, unit=Rate.HOURS))
+# def every_hour(event):
+#     return EventHandler.cw(EventType.QUOTATION, event)
 
 
 # environment

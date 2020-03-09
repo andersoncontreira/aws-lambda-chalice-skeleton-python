@@ -3,8 +3,9 @@ from chalicelib.services.v1.quotation import QuotationService
 
 
 class BaseCommand:
-    def __init__(self):
-        pass
+    def __init__(self, event):
+        self.event = event
+        self.logger = get_logger()
 
     def handle(self):
         raise NotImplementedError('Base commands are not invokable by default')
@@ -15,12 +16,6 @@ class BaseCommand:
 
 class QuotationCommand(BaseCommand):
     def invoke(self, ctx):
-        pass
-
-    def __init__(self, event):
-        super().__init__()
-        self.event = event
-        self.logger = get_logger()
         pass
 
     def __call__(self, event, context):
