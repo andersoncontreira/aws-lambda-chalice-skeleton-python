@@ -7,7 +7,7 @@ from chalicelib.control import Pagination
 from chalicelib.exceptions import ApiException
 from chalicelib.http import ApiResponseStatus, _CUSTOM_DEFAULT_HEADERS
 from chalicelib.http.restful import Hypermedia, transform_list_data
-from chalicelib.messages import MessagesEnum
+from chalicelib.enums.messages import MessagesEnum
 from chalicelib.server import ServerType
 
 

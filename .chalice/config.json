@@ -11,7 +11,12 @@
     "dev": {
       "manage_iam_role" : false,
       "type" : "api",
-      "api_gateway_stage": "api"
+      "api_gateway_stage": "api",
+      "lambda_functions": {
+        "handle_sqs_message": {
+          "lambda_timeout": 30
+        }
+      }
     }
   }
 }

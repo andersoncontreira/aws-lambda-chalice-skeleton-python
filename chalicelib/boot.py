@@ -49,6 +49,12 @@ def load_env():
     os.environ['APP_LOADED'] = str(True)
 
 
+def load_providers():
+    from chalicelib.providers import EventProvider
+    # registar os eventos
+    EventProvider.boot()
+
+
 def register_vendor():
     vendor_path = current_path + "vendor"
     # print(vendor_path)
@@ -62,6 +68,7 @@ def register_vendor():
 def register_path(path):
     if os.path.isdir(path):
         sys.path.insert(0, path)
+
 
 def print_env(app, logger):
     server_type = 'chalice'

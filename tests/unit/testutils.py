@@ -3,10 +3,11 @@ import string
 import traceback
 import logging
 import unittest
-from chalicelib.boot import init, register_vendor
+from chalicelib.boot import init, register_vendor, load_providers
 
 init()
 register_vendor()
+load_providers()
 
 
 def random_string(string_length=10):

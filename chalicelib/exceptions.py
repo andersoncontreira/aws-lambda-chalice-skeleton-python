@@ -3,7 +3,7 @@ import json
 from chalicelib import helper
 
 
-class ApiException(Exception):
+class CustomException(Exception):
     def __init__(self, message_enum, errors=None):
         """
 
@@ -51,6 +51,34 @@ class ApiException(Exception):
 
     def to_dict(self):
         return helper.to_dict(self)
+
+
+class EventException(CustomException):
+    def __init__(self, message_enum, errors=None):
+        """
+
+        :param (MessagesEnum) message_enum:
+        :param errors:
+        """
+        super(CustomException, self).__init__(message_enum.message, errors)
+        self.code = message_enum.code
+        self.label = message_enum.label
+        self.message = message_enum.message
+        self.params = None
+
+
+class ApiException(CustomException):
+    def __init__(self, message_enum, errors=None):
+        """
+
+        :param (MessagesEnum) message_enum:
+        :param errors:
+        """
+        super(CustomException, self).__init__(message_enum.message, errors)
+        self.code = message_enum.code
+        self.label = message_enum.label
+        self.message = message_enum.message
+        self.params = None
 
 
 class DatabaseException(ApiException):

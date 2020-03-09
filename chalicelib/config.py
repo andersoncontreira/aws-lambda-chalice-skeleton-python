@@ -16,6 +16,7 @@ class Configuration:
     APP_NAME = ''
     APP_VERSION = ''
     APP_HOST = ''
+    APP_QUEUE = ''
 
     PORT = 8000
     HTTPS = False
@@ -47,7 +48,7 @@ class Configuration:
         self.APP_LOADED = os.getenv("APP_LOADED") if 'APP_LOADED' in os.environ else False
         self.LOG_LEVEL = os.app_env = logging.getLevelName(
             os.getenv("LOG_LEVEL").upper()) if 'LOG_LEVEL' in os.environ else logging.INFO
-
+        self.APP_QUEUE = os.getenv("APP_QUEUE") if 'APP_QUEUE' in os.environ else ''
         self.load_newrelic_props()
 
     def load_newrelic_props(self, config_file=None):

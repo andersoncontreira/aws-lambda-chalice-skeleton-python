@@ -35,4 +35,7 @@ class MessagesEnum(IntEnum):
     # Database errors 51 - 100
     QUERY_ERROR = 51, 'common.error.query_error', 'Error: Unable to execute the query'
 
-    # Others 101 - 200
+    # Events 101 - 200
+    EVENT_NOT_REGISTERED_ERROR = 101, 'common.error.event_not_registered_error', 'Error: Event nor registered'
+
+    # Others 201 - 300
