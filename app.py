@@ -1,20 +1,17 @@
-from chalicelib.boot import init, register_vendor, print_env, load_providers
+from chalicelib.boot import init, register_vendor, print_env
 
 # execute before other codes of app
-from chalicelib.http.controllers.v1.quotation import QuotationController
-
 register_vendor()
 init()
-load_providers()
 
 # imports
-from chalicelib.events import EventHandler
-from chalicelib.enums.events import EventType
+from chalicelib.events.v1.quotation import QuotationEventHandler
+from chalicelib.http.controllers.v1.quotation import QuotationController
 from chalicelib.http.controllers.api import ApiController
 from chalicelib.logging import get_logger
 from chalicelib import APP_NAME, helper
 from chalicelib.config import get_config
-from chalice import Chalice, Rate
+from chalice import Chalice
 
 # chalice app
 app = Chalice(app_name=APP_NAME)
@@ -49,13 +46,7 @@ def list_quotation():
 
 @app.on_sqs_message(queue=get_config().APP_QUEUE, batch_size=1)
 def handle_sqs_message(event):
-    return EventHandler.sqs(EventType.QUOTATION, event)
-
-
-# @app.schedule(Rate(1, unit=Rate.HOURS))
-# def every_hour(event):
-#     return EventHandler.cw(EventType.QUOTATION, event)
-
+    return QuotationEventHandler(event).handle()
 
 # environment
 print_env(app, app.log)

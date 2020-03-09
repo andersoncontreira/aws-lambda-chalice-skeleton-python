@@ -1,17 +1,9 @@
+from chalicelib.events import BaseEventHandler
 from chalicelib.helper import get_logger
 from chalicelib.services.v1.quotation import QuotationService
 
 
-class BaseCommand:
-    def __init__(self, event):
-        self.event = event
-        self.logger = get_logger()
-
-    def handle(self):
-        raise NotImplementedError('Base commands are not invokable by default')
-
-
-class QuotationCommand(BaseCommand):
+class QuotationEventHandler(BaseEventHandler):
 
     def __call__(self, event, context):
         self.event = event

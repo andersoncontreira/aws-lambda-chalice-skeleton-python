@@ -2,7 +2,6 @@ import os
 import sys
 
 from dotenv import load_dotenv
-from chalicelib.config import get_config
 
 if __package__:
     current_path = os.path.abspath(os.path.dirname(__file__)).replace('/' + str(__package__), '', 1)
@@ -47,12 +46,6 @@ def load_env():
         raise Exception('Environment parameters must be defined')
 
     os.environ['APP_LOADED'] = str(True)
-
-
-def load_providers():
-    from chalicelib.providers import EventProvider
-    # registar os eventos
-    EventProvider.boot()
 
 
 def register_vendor():
