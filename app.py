@@ -1,6 +1,8 @@
 from chalicelib.boot import init, register_vendor, print_env, load_providers
 
 # execute before other codes of app
+from chalicelib.http.controllers.v1.quotation import QuotationController
+
 register_vendor()
 init()
 load_providers()
@@ -22,6 +24,7 @@ logger = get_logger()
 
 # Controllers
 api_controller = ApiController(logger)
+quotation_controller = QuotationController(logger)
 
 
 @app.route('/', cors=True)
@@ -37,6 +40,11 @@ def ping():
 @app.route('/alive')
 def alive():
     return api_controller.alive(app)
+
+
+@app.route('/quotation')
+def list_quotation():
+    return quotation_controller.list(app)
 
 
 @app.on_sqs_message(queue=get_config().APP_QUEUE, batch_size=1)
