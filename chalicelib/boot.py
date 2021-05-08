@@ -1,7 +1,11 @@
+import json
 import os
 import sys
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values
+
+from chalicelib import APP_NAME
+from chalicelib.aws.secrets import Secrets
 
 if __package__:
     current_path = os.path.abspath(os.path.dirname(__file__)).replace('/' + str(__package__), '', 1)
@@ -11,41 +15,163 @@ else:
 if not current_path[-1] == '/':
     current_path += '/'
 
+ROOT_DIR = current_path
+_LOADED = False
 
-def init():
-    if not 'APP_ENV' in os.environ:
-        env_file_path = current_path + '.env'
+try:
+    import chalicelib
 
-        if os.path.isfile(env_file_path):
-            load_dotenv(env_file_path)
+    APP_TYPE = 'Chalice'
+except Exception as err:
+    APP_TYPE = 'Flask'
+
+_DEFAULT_ENV_CONFIGS = {
+    "APP_ENV": "development",
+    "DEBUG": "true",
+    "LOG_LEVEL": "info",
+    "APP_TYPE": APP_TYPE
+}
+
+
+def set_root_dir(root_dir):
+    global ROOT_DIR
+    ROOT_DIR = root_dir
+
+
+def is_loaded():
+    global _LOADED
+    return _LOADED
+
+
+def reset():
+    global _LOADED
+    _LOADED = False
+
+
+def get_internal_logger():
+    try:
+        from chalicelib.logging import get_logger
+        logger = get_logger()
+    except Exception as err:
+        print('load_env: Unable to load logger: {}'.format(err))
+        import logging
+        log_name = APP_NAME
+        logger = logging.getLogger(log_name)
+    return logger
+
+
+def load_dot_env(env='development', force=False):
+    # env default value
+    if env is None:
+        env = 'development'
+
+    logger = get_internal_logger()
+
+    global _LOADED
+    if not _LOADED or force:
+        logger.info('Boot - Loading env: {}'.format(env))
+
+        # Default
+        for k, v in _DEFAULT_ENV_CONFIGS.items():
+            if k == 'APP_ENV':
+                v = env
+            os.environ[k] = v
+
+        config_path = '{}config/{}.env'.format(current_path, env)
+        if os.path.isfile(config_path):
+            env_vars = dotenv_values(config_path)
+
+            for k, v in env_vars.items():
+                os.environ[k] = v
+            _LOADED = True
         else:
-            env_file_path = current_path + '/.env'
-            if os.path.isfile(env_file_path):
-                load_dotenv(env_file_path)
+            # Try to load via secrets manager
+            result = load_secrets(env=env)
+            if result:
+                _LOADED = True
+            else:
+                # try with development
+                if env == 'dev':
+                    load_dot_env('development')
+                logger.error('Unable to load config')
 
-    if not 'APP_ENV' in os.environ:
-        raise Exception('Environment parameters must be defined')
-
-    load_env()
-
-
-def load_env():
-    environment_path = current_path + 'environment/'
-    env_file_name = ('%s.env' % os.getenv("APP_ENV") if 'APP_ENV' in os.environ else 'development')
-    env_file_path = environment_path + env_file_name
-
-    if os.path.isfile(env_file_path):
-        load_dotenv(env_file_path)
     else:
-        environment_path = current_path + '/environment/'
-        env_file_path = environment_path + env_file_name
-        if os.path.isfile(env_file_path):
-            load_dotenv(env_file_path)
+        pass
 
-    if not 'DB_HOST' in os.environ:
-        raise Exception('Environment parameters must be defined')
 
-    os.environ['APP_LOADED'] = str(True)
+def load_secrets(env='staging'):
+    logger = get_internal_logger()
+    result = False
+
+    logger.info('Boot - Loading env by secret manager: {}'.format(env))
+    app_name = os.environ["APP_NAME"] if "APP_NAME" in os.environ else APP_NAME
+    secret_name = app_name + "-" + env
+    try:
+        logger.info('secret name: {}'.format(secret_name))
+        secrets_dict = Secrets().get_secrets(secret_name=secret_name)
+    except Exception as err:
+        secrets_dict = None
+        logger.error(err)
+
+    if secrets_dict is not None:
+        for k, v in secrets_dict.items():
+            os.environ[k] = v
+        result = True
+
+    return result
+
+
+def load_env(env='dev', force=False):
+    # env default value
+    if env is None:
+        env = 'dev'
+
+    logger = get_internal_logger()
+
+    global _LOADED
+    if not _LOADED or force:
+
+        logger.info('Boot - Loading env: {}'.format(env))
+
+        # Default
+        for k, v in _DEFAULT_ENV_CONFIGS.items():
+            if k == 'APP_ENV':
+                v = env
+            os.environ[k] = v
+
+        chalice_config_path = '{}.chalice/config.json'.format(current_path)
+
+        if os.path.isfile(chalice_config_path):
+            file = open(chalice_config_path, 'r')
+            data = file.read()
+            configs = json.loads(data)
+
+            # solution for projects with integration tests
+            if env not in configs['stages'] and env == 'integration':
+                env = 'staging'
+            # solution for projects with dev flag instead of development
+            if env not in configs['stages'] and env == 'development':
+                env = 'dev'
+
+            if env in configs['stages']:
+                env_vars = configs['stages'][env]['environment_variables']
+                for k, v in env_vars.items():
+                    os.environ[k] = v
+                _LOADED = True
+            else:
+                # solution for projects with development flag instead of dev
+                if env == 'dev':
+                    load_env('development')
+                else:
+                    logger.error('Unable to load config')
+                    _LOADED = False
+            # close the file
+            file.close()
+        else:
+            logger.error('Unable to load config')
+            _LOADED = False
+    else:
+        pass
 
 
 def register_vendor():
@@ -64,9 +190,9 @@ def register_path(path):
 
 
 def print_env(app, logger):
-    server_type = 'chalice'
-    logger.info('Server: %s' % server_type)
     logger.info('Environment: %s' % os.getenv('APP_ENV'))
-    logger.info('Database: %s' % os.getenv('DB_HOST'))
+    # logger.info('Host: %s' % os.getenv('APP_HOST'))
+    # logger.info('Port: %s' % os.getenv('APP_PORT'))
+    # logger.info('Database: %s' % os.getenv('DB_HOST'))
     logger.info('Log Level: %s' % os.getenv('LOG_LEVEL'))
     logger.info('Debug: %s' % os.getenv('DEBUG'))

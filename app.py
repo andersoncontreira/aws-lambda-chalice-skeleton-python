@@ -1,55 +1,112 @@
-from chalicelib.boot import init, register_vendor, print_env
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import base64
+import os
 # execute before other codes of app
+from chalicelib.boot import register_vendor
 register_vendor()
-init()
 
-# imports
-from chalicelib.events.v1.quotation import QuotationEventHandler
-from chalicelib.http.controllers.v1.quotation import QuotationController
-from chalicelib.http.controllers.api import ApiController
-from chalicelib.logging import get_logger
-from chalicelib import APP_NAME, helper
+from chalicelib.openapi import generate_openapi_yml, spec, get_doc, api_schemas
+from chalicelib.helper import open_vendor_file
+from chalicelib.http_helper import CUSTOM_DEFAULT_HEADERS
 from chalicelib.config import get_config
-from chalice import Chalice
+from chalicelib.logging import get_logger, get_log_level
+from chalicelib import APP_NAME, helper, http_helper, APP_VERSION
+from chalice import Chalice, CustomAuthorizer
 
-# chalice app
-app = Chalice(app_name=APP_NAME)
-
+# config
+config = get_config()
+# debug
+debug = helper.debug_mode()
 # logger
 logger = get_logger()
+# chalice app
+app = Chalice(app_name=APP_NAME, debug=debug)
+# override the log configs
+if not debug:
+    # override to the level desired
+    logger.level = get_log_level()
+# override the log instance
+app.log = logger
 
-# Controllers
-api_controller = ApiController(logger)
-quotation_controller = QuotationController(logger)
+# general vars
+APP_QUEUE = config.APP_QUEUE
 
 
 @app.route('/', cors=True)
 def index():
-    return api_controller.index(app)
+    body = {"app": '%s:%s' % (APP_NAME, APP_VERSION)}
+    logger.info('Env: {} App Info: {}'.format(config.APP_ENV, body))
+    # Temporário para debug
+    logger.info('Env Vars: {}'.format(config.to_dict()))
+    return http_helper.create_response(body=body, status_code=200)
 
 
-@app.route('/ping', cors=True)
-def ping():
-    return api_controller.ping(app)
-
-
-@app.route('/alive')
+@app.route('/alive', cors=True)
 def alive():
-    return api_controller.alive(app)
+    """
+
+    :return:
+
+    ---
+
+        get:
+            summary: Service Health Method
+            responses:
+                200:
+                    description: Success response
+                    content:
+                        application/json:
+                            schema: AliveSchema
+        """
+    body = {"app": "I'm alive!"}
+    return http_helper.create_response(body=body, status_code=200)
 
 
-@app.route('/quotation')
-def list_quotation():
-    return quotation_controller.list(app)
+@app.route('/favicon-32x32.png', cors=True)
+def favicon():
+    headers = CUSTOM_DEFAULT_HEADERS.copy()
+    headers['Content-Type'] = "image/png"
+    data = base64.b64decode(
+        'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAkFBMVEUAAAAQM0QWNUYWNkYXNkYALjoWNUYYOEUXN0YaPEUPMUAUM0QVNUYWNkYWNUYWNUUWNUYVNEYWNkYWNUYWM0eF6i0XNkchR0OB5SwzZj9wyTEvXkA3az5apTZ+4C5DgDt31C9frjU5bz5uxTI/eDxzzjAmT0IsWUEeQkVltzR62S6D6CxIhzpKijpJiDpOkDl4b43lAAAAFXRSTlMAFc304QeZ/vj+ECB3xKlGilPXvS2Ka/h0AAABfklEQVR42oVT2XaCMBAdJRAi7pYJa2QHxbb//3ctSSAUPfa+THLmzj4DBvZpvyauS9b7kw3PWDkWsrD6fFQhQ9dZLfVbC5M88CWCPERr+8fLZodJ5M8QJbjbGL1H2M1fIGfEm+wJN+bGCSc6EXtNS/8FSrq2VX6YDv++XLpJ8SgDWMnwqznGo6alcTbIxB2CHKn8VFikk2mMV2lEnV+CJd9+jJlxXmMr5dW14YCqwgbFpO8FNvJxwwM4TPWPo5QalEsRMAcusXpi58/QUEWPL0AK1ThM5oQCUyXPoPINkdd922VBw4XgTV9zDGWWFrgjIQs4vwvOg6xr+6gbCTqE+DYhlMGX0CF2OknK5gQ2JrkDh/W6TOEbYDeVecKbJtyNXiCfGmW7V93J2hDus1bDfhxWbIZVYDXITA7Lo6E0Ktgg9eB4KWuR44aj7ppBVPazhQH7/M/KgWe9X1qAg8XypT6nxIMJH+T94QCsLvj29IYwZxyO9/F8vCbO9tX5/wDGjEZ7vrgFZwAAAABJRU5ErkJggg==')
+    return http_helper.create_response(body=data, status_code=200, headers=headers)
 
 
-@app.on_sqs_message(queue=get_config().APP_QUEUE, batch_size=1)
-def handle_sqs_message(event):
-    return QuotationEventHandler(event).handle()
+@app.route('/docs', cors=True)
+def docs():
+    headers = CUSTOM_DEFAULT_HEADERS.copy()
+    headers['Content-Type'] = "text/html"
+    html_file = open_vendor_file('./public/swagger/index.html', 'r')
+    html = html_file.read()
+    return http_helper.create_response(body=html, status_code=200, headers=headers)
 
-# environment
-print_env(app, app.log)
 
-# print the registered routes
-helper.print_routes(app, app.log)
+@app.route('/openapi.yml', cors=True)
+def openapi():
+    headers = CUSTOM_DEFAULT_HEADERS.copy()
+    headers['Content-Type'] = "text/yaml"
+    html_file = open_vendor_file('./public/swagger/openapi.yml', 'r')
+    html = html_file.read()
+    return http_helper.create_response(body=html, status_code=200, headers=headers)
+
+
+# @app.route('/quotation')
+# def list_quotation():
+#     return quotation_controller.list(app)
+#
+#
+# @app.on_sqs_message(queue=get_config().APP_QUEUE, batch_size=1)
+# def handle_sqs_message(event):
+#     return QuotationEventHandler(event).handle()
+
+
+# doc
+spec.path(view=alive, path="/alive", operations=get_doc(alive))
+# spec.path(view=event_list, path="/v1/event/{event_type}", operations=get_doc(event_list))
+# spec.path(view=event_create, path="/v1/event/{event_type}", operations=get_doc(event_create))
+
+helper.print_routes(app, logger)
+logger.info('Running at {}'.format(os.environ['APP_ENV']))
+
+# generate de openapi.yml
+generate_openapi_yml(spec, logger)

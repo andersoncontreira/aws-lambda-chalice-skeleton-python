@@ -1,6 +1,16 @@
 # Aws Lambda Chalice Skeleton for python 
 Skeleton to create microservices using Chalice and Lambda.
 
+## Service Architecture
+This service is the main part of the follow architecture.
+ 
+[comment]: <> (![AWS Architecture]&#40;docs/Sourcing_Service-V0.png&#41;)
+
+## Swagger Docs
+OpenApi example:
+
+![Swagger OpenApi](docs/openapi.png)
+  
 ## Release notes 
 
 In this section contains the release notes of the project.
@@ -11,111 +21,121 @@ In this section contains the release notes of the project.
 
 All the changes must be tracked in [CHANGELOG.md](CHANGELOG.md)
 
+  
+## Prerequisites
+- Python 3.6
+- python-dotenv
+- jsonformatter
+- requests
+- pytz
+- redis
+- pyyaml
+- apispec
+- marshmallow
+- Flask
+
 ## Features
- * Basic RESTful structure;;
- * Docker to development environment;
- * Binaries commands to automatize some actions;
- * Environment variables support;
- * Unit and Functional tests structure;
- 
+- Docker-compose 
+- OpenApi
 
-## Installing
+## Installation
 
-### Installing in the virtual environment
-execute the follow command:
+### Running Locally
+To create the `venv` and install the modules execute:
 ```
-./bin/chalice/venv.sh
+./bin/venv.sh
 ```
-
-### Installing without a virtual environment
-#### Installing public dependencies
-execute the follow command:
+#### Running the chalice
+Execute the follow command:
 ```
-./bin/chalice/install.sh
+./bin/flask/run-local.sh
 ```
-#### Installing private dependencies only
-execute the follow command:
+### Running via docker
+To execute the build:
 ```
-./bin/chalice/install-vendor.sh
+./bin/runenv.sh --build
 ```
 
-## Building
-execute the follow command:
+Execute the follow command:
 ```
-./bin/chalice/build.sh
-```
-## Running locally
-execute the follow command:
-```
-./bin/chalice/run-local.sh
-```
-## Working with Docker
-If you are working with `Docker` follow the further steps.
-
-### Installing vendor modules
-execute the follow command:
-```
-./bin/chalice/install-vendor.sh
+./bin/runenv.sh
 ```
 
-### Building Docker
-execute the follow command:
+### Boot the queues
+Execute the follow command:
 ```
-./bin/chalice/build.sh
-```
-
-### Running Docker
-execute the follow command:
-```
-./bin/chalice/run-docker.sh
+./bin/boot.sh
 ```
 
-### Running Docker Compose
-execute the follow command:
-```
-./bin/chalice/run-docker-compose.sh
-```
-Or:
-```
-./bin/chalice/run-docker-compose.sh -d --build
-```
-
-## Getting started
-
-### Project setup
-You need to create a `.env` to work locally, you can copy the file `.env.example`.
-
-File example:
-```
-APP_ENV=development
-APP_HOST=localhost
-PORT=8000
-HTTPS=False
-DEBUG=False
-```
+## Samples
+See the project samples in this folder [here](samples).
 
 ## Running tests
-
 To run the unit tests of the project you can execute the follow command:
 
-### Installing tests dependencies
-execute the follow command:
-```
-./bin/install-tests.sh
-```
-### Running tests scenarios 
+First you need install the tests requirements:
+ ```
+ ./bin/venv-exec.sh ./bin/tests/install-tests.sh 
+ ```
 
-All tests:
-``` 
-./bin/test.sh 
+ 
+### Unit tests:
+Execute the follow command:
+ ```
+./bin/venv-exec.sh ./bin/tests/unit-tests.sh
+ ``` 
+
+### Components tests:
+Booting the environment:
+ ```
+./bin/runenv.sh
 ```
 
-Unit tests:
-``` 
-./bin/unit-tests.sh 
+Executing the tests:
+ ```
+./bin/venv-exec.sh ./bin/tests/component-tests.sh
+```
+### Integration tests:
+Executing the tests:
+ ```
+./bin/venv-exec.sh ./bin/tests/integration-tests.sh
 ```
 
-Functional tests:
-``` 
-./bin/functional-tests.sh 
+
+### All tests:
+Executing the tests:
 ```
+ ./bin/venv-exec.sh ./bin/tests/tests.sh 
+ ```
+
+## Generating coverage reports
+To execute coverage tests you can execute the follow commands:
+
+Unit test coverage:
+``` 
+./bin/venv-exec.sh ./bin/tests/unit-coverage.sh
+``` 
+
+Component test coverage:
+``` 
+./bin/venv-exec.sh ./bin/tests/component-coverage.sh
+```
+
+Integration test coverage:
+``` 
+./bin/venv-exec.sh ./bin/tests/integration-coverage.sh
+```
+> Observation:
+
+The result can be found in the folder `target/*`.
+
+### Tests results examples:
+Unit test console:
+![Unittest](docs/unittest.png)
+Unit test coverage report in HTML:
+![Unittest](docs/coverage.png)
+## License
+See the license [LICENSE.md](LICENSE.md).
+
+## Contributions
+* Anderson de Oliveira Contreira [andersoncontreira](https://github.com/andersoncontreira)

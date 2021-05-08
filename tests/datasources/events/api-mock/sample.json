@@ -1,0 +1,7 @@
+{
+    "event_type-origin": "sale-event",
+    "order_id": 123456,
+    "success": true,
+    "skus": [174028, 657705],
+    "date": "2021-04-20T18:20:00"
+}

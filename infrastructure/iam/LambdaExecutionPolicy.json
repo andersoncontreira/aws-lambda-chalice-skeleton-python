@@ -1,0 +1,54 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetRole",
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::${account_id}:role/${app_name}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:ListFunctions",
+        "lambda:GetAccountSettings",
+        "lambda:CreateEventSourceMapping",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListLayerVersions",
+        "lambda:ListLayers",
+        "ec2:DetachNetworkInterface",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeVpcs",
+        "ec2:AttachNetworkInterface",
+        "ec2:DescribeSubnets",
+        "ec2:DeleteNetworkInterface"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "lambda:*",
+      "Resource": [
+        "arn:aws:lambda:*:*:event-source-mapping:*",
+        "arn:aws:lambda:*:${account_id}:layer:*",
+        "arn:aws:lambda:*:*:layer:*:*",
+        "arn:aws:lambda:${aws_region}:${account_id}:function:*"
+      ]
+    }
+  ]
+}

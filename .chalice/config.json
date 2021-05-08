@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "app_name": "app-name",
+  "app_name": "aws_lambda_chalice_skeleton_python",
   "tags" : {
     "Sector":"Sector Name",
     "Team":"Team Name",
@@ -8,14 +8,112 @@
   },
   "lambda_timeout": 40,
   "stages": {
-    "dev": {
-      "manage_iam_role" : false,
-      "type" : "api",
-      "api_gateway_stage": "api",
+    "production": {
+      "autogen_policy": false,
+      "iam_policy_file": "../infrastructure/iam/LambdaExecutionPolicy.json",
       "lambda_functions": {
         "handle_sqs_message": {
-          "lambda_timeout": 30
+          "lambda_timeout": 120
         }
+      },
+      "environment_variables": {
+        "APP_ENV": "production",
+        "DEBUG": "true",
+        "LOG_LEVEL": "info",
+        "REGION_NAME": "us-east-2",
+        "SQS_ENDPOINT": "https://sqs.us-east-2.amazonaws.com",
+        "APP_QUEUE": "https://sqs.us-east-2.amazonaws.com/000000000000/sourcing-service-events-api-staging-rules-queue",
+        "API_URL": "http://localhost:3000/v1/product",
+        "API_TOKEN": "Authorization: ab6bfe233c5bfa90f96a1fdda2360b96b458f3e2",
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": "6379",
+        "API_SERVER": "https://services.hagatus.com.br",
+        "API_SERVER_DESCRIPTION": "Staging server"
+      },
+      "type": "queue",
+      "tags": {
+        "Env": "integration"
+      }
+    },
+    "staging": {
+      "autogen_policy": false,
+      "iam_policy_file": "../infrastructure/iam/LambdaExecutionPolicy.json",
+      "lambda_functions": {
+        "handle_sqs_message": {
+          "lambda_timeout": 120
+        }
+      },
+      "environment_variables": {
+        "APP_ENV": "staging",
+        "DEBUG": "true",
+        "LOG_LEVEL": "info",
+        "REGION_NAME": "us-east-2",
+        "SQS_ENDPOINT": "https://sqs.us-east-2.amazonaws.com",
+        "APP_QUEUE": "https://sqs.us-east-2.amazonaws.com/000000000000/sourcing-service-events-api-staging-rules-queue",
+        "API_URL": "http://localhost:3000/v1/product",
+        "API_TOKEN": "Authorization: ab6bfe233c5bfa90f96a1fdda2360b96b458f3e2",
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": "6379",
+        "API_SERVER": "https://services.hagatus.com.br",
+        "API_SERVER_DESCRIPTION": "Staging server"
+      },
+      "type": "queue",
+      "tags": {
+        "Env": "integration"
+      }
+    },
+    "integration": {
+      "autogen_policy": false,
+      "iam_policy_file": "../infrastructure/iam/LambdaExecutionPolicy.json",
+      "lambda_functions": {
+        "handle_sqs_message": {
+          "lambda_timeout": 120
+        }
+      },
+      "environment_variables": {
+        "APP_ENV": "integration",
+        "DEBUG": "true",
+        "LOG_LEVEL": "info",
+        "REGION_NAME": "us-east-2",
+        "SQS_ENDPOINT": "https://sqs.us-east-2.amazonaws.com",
+        "APP_QUEUE": "https://sqs.us-east-2.amazonaws.com/000000000000/sourcing-service-events-api-staging-rules-queue",
+        "API_URL": "http://localhost:3000/v1/product",
+        "API_TOKEN": "Authorization: ab6bfe233c5bfa90f96a1fdda2360b96b458f3e2",
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": "6379",
+        "API_SERVER": "https://services.hagatus.com.br",
+        "API_SERVER_DESCRIPTION": "Staging server"
+      },
+      "type": "queue",
+      "tags": {
+        "Env": "integration"
+      }
+    },
+    "dev": {
+      "autogen_policy": false,
+      "iam_policy_file": "../infrastructure/iam/LambdaExecutionPolicy.json",
+      "lambda_functions": {
+        "handle_sqs_message": {
+          "lambda_timeout": 120
+        }
+      },
+      "environment_variables": {
+        "APP_ENV": "development",
+        "DEBUG": "true",
+        "LOG_LEVEL": "info",
+        "REGION_NAME": "us-east-2",
+        "SQS_ENDPOINT": "http://localhost:4566",
+        "APP_QUEUE": "http://localhost:4566/000000000000/sourcing-service-events-api-staging-rules-queue",
+        "API_URL": "http://localhost:3000/v1/product",
+        "API_TOKEN": "Authorization: ab6bfe233c5bfa90f96a1fdda2360b96b458f3e2",
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": "6379",
+        "API_SERVER": "https://services.hagatus.com.br",
+        "API_SERVER_DESCRIPTION": "Staging server"
+      },
+      "type": "queue",
+      "tags": {
+        "Env": "integration"
       }
     }
   }

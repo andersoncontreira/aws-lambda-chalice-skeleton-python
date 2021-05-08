@@ -1,0 +1,38 @@
+version: 0.2
+env:
+  variables:
+    S3_BUCKET: "generic-lambda-builds"
+    PROJECT_NAME: "aws-lambda-chalice-skeleton-python"
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  build:
+    commands:
+      - echo Installing all requirements
+      - pip install -r ./requirements.txt
+      - pip install -r ./requirements-vendor.txt
+  post_build:
+    commands:
+      - echo Installing test requirements
+      - pip install -r ./requirements-tests.txt
+      - echo Running unit testes
+      - ./bin/tests/unit-coverage-no-report-html.sh
+      # Uninstall test dependencies
+      - pip uninstall -r requirements-tests.txt -y
+    finally:
+       - echo Replacing account variable of .chalice/config.json
+       - sed -i "s/\${AWS::AccountId}/${ACCOUNT_ID}/g" .chalice/config.json
+       - echo Generating package file
+       - ./bin/chalice/package.sh  --stage production
+       - aws cloudformation package --template-file sam.json --s3-bucket $S3_BUCKET --s3-prefix $PROJECT_NAME --output-template-file packaged.yml
+reports:
+  UnitTestsReports:
+    files:
+      - 'target/unit/clover.xml'
+    file-format: 'CLOVERXML'
+artifacts:
+  files:
+    - sam.json
+    - packaged.yml
+    - appspec.yml

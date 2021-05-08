@@ -1,7 +1,21 @@
+import json
 from enum import Enum, IntEnum
 
 
 class CustomEnum(Enum):
+
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.to_json()
+
+    def to_dict(self):
+        return {'value': self.value}
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
     @classmethod
     def get_values(cls):
         return list(map(lambda c: c.value, cls))
@@ -68,5 +82,3 @@ class CustomStringEnum(CustomEnum):
             if e.description == description:
                 return e
         return None
-
-

@@ -1,0 +1,121 @@
+{
+  "product": [
+    {
+      "sku": 5000,
+      "event_type": "decision-event",
+      "is_multisource": true,
+      "multisourcing": {
+        "50001": {
+          "supplier_id": "004578",
+          "share": 70.0,
+          "active": true,
+          "owner": true
+        },
+        "50002": {
+          "supplier_id": "004578",
+          "share": 30.0,
+          "active": true,
+          "owner": true
+        }
+      }
+    },
+    {
+      "sku": 1000,
+      "event_type": "decision-event",
+      "is_multisource": true,
+      "multisourcing": {
+        "1000": {
+          "supplier_id": "004578",
+          "share": 70.0,
+          "active": true,
+          "owner": true
+        },
+        "10002": {
+          "supplier_id": "004578",
+          "share": 30.0,
+          "active": true,
+          "owner": true
+        }
+      }
+    },
+    {
+      "sku": "657705",
+      "is_multisource": true,
+      "success": true,
+      "multisourcing": {
+        "657705": {
+          "supplier_id": "000242",
+          "share": 0,
+          "active": true,
+          "owner": true
+        },
+        "660144": {
+          "supplier_id": "002087",
+          "share": 0,
+          "active": true,
+          "owner": false
+        },
+        "660143": {
+          "supplier_id": "001853",
+          "share": 100,
+          "active": true,
+          "owner": false
+        }
+      }
+    },
+    {
+      "sku:660143": {
+        "sku": "657705",
+        "is_multisource": true,
+        "success": true,
+        "multisourcing": {
+          "657705": {
+            "supplier_id": "000242",
+            "share": 0,
+            "active": true,
+            "owner": true
+          },
+          "660144": {
+            "supplier_id": "002087",
+            "share": 0,
+            "active": true,
+            "owner": false
+          },
+          "660143": {
+            "supplier_id": "001853",
+            "share": 100,
+            "active": true,
+            "owner": false
+          }
+        }
+      }
+    },
+    {
+      "sku:657705": {
+        "sku": "657705",
+        "is_multisource": true,
+        "success": true,
+        "multisourcing": {
+          "657705": {
+            "supplier_id": "000242",
+            "share": 0,
+            "active": true,
+            "owner": true
+          },
+          "660144": {
+            "supplier_id": "002087",
+            "share": 0,
+            "active": true,
+            "owner": false
+          },
+          "660143": {
+            "supplier_id": "001853",
+            "share": 100,
+            "active": true,
+            "owner": false
+          }
+        }
+      }
+    }
+  ]
+}

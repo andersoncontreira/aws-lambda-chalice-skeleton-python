@@ -1,3 +1,8 @@
 unittest-data-provider
 coverage
+coverage2clover
 mock
+boto3
+unittest_xml_reporting
+fakeredis
+requests_mock

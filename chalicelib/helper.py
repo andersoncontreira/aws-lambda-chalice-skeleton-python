@@ -1,23 +1,41 @@
-# import datetime
-# import json
-# import os
-# import re
-#
-# from dateutil.parser import isoparse, parser
-#
+import hashlib
 import json
 import os
+import sys
+from datetime import datetime
+from enum import Enum
 
-from chalicelib.server import ServerType
-#
-#
-# def query_param(app, param_name, default):
-#     if app is not None and app.current_request is not None:
-#         return app.current_request.query_params and app.current_request.query_params.get(param_name)
-#     else:
-#         return default
-#
-#
+import pytz
+
+from chalicelib.logging import get_logger
+
+TZ_AMERICA_SAO_PAULO = 'America/Sao_Paulo'
+
+
+def generate_hash(data):
+    event_hash = hashlib.sha256(str(data).encode()).hexdigest()
+    return event_hash
+
+
+def open_vendor_file(filename, mode):
+    if __package__:
+        current_path = os.path.abspath(os.path.dirname(__file__)).replace('/' + str(__package__), '', 1)
+    else:
+        current_path = os.path.abspath(os.path.dirname(__file__))
+
+    directories = [
+        '.',
+        './vendor',
+        '/opt/python/lib/python%s.%s/site-packages' % sys.version_info[:2],
+        current_path
+    ]
+
+    for dirname in directories:
+        full_path = os.path.join(dirname, filename)
+        if os.path.isfile(full_path):
+            return open(full_path, mode=mode)
+
+
 def empty(where):
     result = False
     if isinstance(where, dict) and where == {}:
@@ -31,125 +49,14 @@ def empty(where):
     elif where is None:
         result = True
     return result
-#
-#
-# def filter_sql_injection(value):
-#     check_value = str(value).replace('-', '')
-#     pattern = '(select|from|where)'
-#     if re.search(pattern, check_value, re.I):
-#         value = None
-#     return value
-#
-#
-# def filter_fields(fields):
-#     filtered = None
-#     if isinstance(fields, list):
-#         filtered = []
-#         for v in fields:
-#             if v == '*':
-#                 pass
-#             else:
-#                 filtered_value = filter_sql_injection(v)
-#                 if not empty(filtered_value):
-#                     filtered_value = filtered_value.strip()
-#                     filtered.append(filtered_value)
-#         if len(filtered) == 0:
-#             filtered = None
-#     return filtered
-#
-#
-# def gt_zero(param, default):
-#     # print('param', param, int(param))
-#     try:
-#         return int(param) if int(param) > 0 else default
-#     except:
-#         return default
-#
-#
-def print_routes(app, logger):
-    """
 
-    :param logger:
-    :param (chalice.Chalice) app:
-    :return:
-    """
-    logger.info('List of routes:')
-    if has_attr(app, 'get_routes'):
-        routes = app.get_routes()
-    elif has_attr(app, 'url_map'):
-        routes = {rule.rule: dict.fromkeys(rule.methods, 0) for rule in app.url_map.iter_rules()}
-    else:
-        routes = app.routes
-    for path, dict_route in routes.items():
-        method = list(dict_route.keys()).pop()
-        logger.info('Route: %s - %s', method, path)
-        # print('Route: %s - %s' % (method, path))
-#
-#
-# def validate_field(field, entity_fields):
-#     filtered = None
-#     if entity_fields and field in entity_fields:
-#         filtered = field
-#     return filtered
-#
-#
-# def validate_fields(fields, entity_fields):
-#     # print('fields', fields)
-#     # print(entity_fields)
-#     filtered = None
-#     if isinstance(fields, list):
-#         filtered = []
-#         for field in fields:
-#             validated = validate_field(field, entity_fields)
-#             if validated:
-#                 filtered.append(validated)
-#     return filtered
-#
-#
+
 def has_attr(object, attribute):
     try:
         if hasattr(object, attribute):
             return True
     except Exception as err:
         return False
-#
-#
-# def get_current_datetime():
-#     return datetime.datetime.utcnow()
-#
-#
-# def get_datetime_interval(days):
-#     interval = datetime.timedelta(days=days)
-#     return datetime.datetime.utcnow() + interval
-#
-#
-# def parse_string_date(str_date, iso_format=True):
-#     # print('xxx', str_date)
-#     if iso_format:
-#         date = isoparse(str_date)
-#     else:
-#         date_parser = parser()
-#         date = date_parser.parse(str_date, None)
-#     return date
-#
-#
-def get_logger():
-    from chalicelib.logging import get_logger
-    logger = get_logger()
-    logger.info('Imported log locally')
-    return logger
-#
-#
-# def get_newrelic_logger():
-#     from newrelic_api_log_handler.logging import get_logger
-#     logger = get_logger()
-#     return logger
-#
-#
-
-def get_server_type(app):
-    server_type = ServerType.CHALICE
-    return server_type
 
 
 def to_dict(obj, force_str=False):
@@ -160,7 +67,9 @@ def to_dict(obj, force_str=False):
         # return {k: v for k, v in data.items() if v is not None}
         _dict = {}
         for k, v in data.items():
-            if getattr(v, "to_dict", None):
+            if isinstance(v, Enum):
+                _dict[k] = str(v)
+            elif getattr(v, "to_dict", None):
                 # recursivo
                 _dict[k] = to_dict(v, force_str)
             else:
@@ -170,6 +79,57 @@ def to_dict(obj, force_str=False):
 
 def to_json(obj):
     return json.dumps(obj)
+
+
+def debug_mode():
+    result = False
+    if 'DEBUG' in os.environ and str(os.getenv('DEBUG')).lower() == 'true':
+        result = True
+    return result
+
+
+def convert_to_int(str_value):
+    """
+    Essa função foi criada para ser usada em loops funcionais z = [x for x in y]
+    :param str_value:
+    :return:
+    :rtype: int
+    """
+    value = 0
+    try:
+        value = int(str_value)
+    except Exception as err:
+        get_logger().error(err)
+
+    return value
+
+
+def convert_to_float(str_value):
+    """
+    Essa função foi criada para ser usada em loops funcionais z = [x for x in y]
+    :param str_value:
+    :return:
+    :rtype: float
+    """
+    value = 0
+    try:
+        value = float(str_value)
+    except Exception as err:
+        get_logger().error(err)
+
+    return value
+
+
+def datetime_now_with_timezone(timezone_name='America/Sao_Paulo'):
+    return datetime.now(tz=pytz.timezone(timezone_name))
+
+
+def datetime_format_for_database(datetime_object):
+    return datetime_object.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def datetime_format_for_lifecycle(datetime_object):
+    return datetime_object.isoformat()
 
 
 def get_protocol():
@@ -184,3 +144,23 @@ def is_https():
     if 'HTTPS' in os.environ and str(os.getenv('HTTPS')).lower() == 'true':
         result = True
     return result
+
+
+def print_routes(app, logger):
+    """
+    :param logger:
+    :param (chalice.Chalice) app:
+    :return:
+    """
+    logger.info('List of routes:')
+
+    if has_attr(app, 'get_routes'):
+        routes = app.get_routes()
+    elif has_attr(app, 'url_map'):
+        routes = {rule.rule: dict.fromkeys(rule.methods, 0) for rule in app.url_map.iter_rules()}
+    else:
+        routes = app.routes
+    for path, dict_route in routes.items():
+        methods = list(dict_route.keys())
+        for method in methods:
+            logger.info('Route: %s - %s', method, path)

@@ -6,7 +6,6 @@ from chalicelib import helper
 class CustomException(Exception):
     def __init__(self, message_enum, errors=None):
         """
-
         :param (MessagesEnum) message_enum:
         :param errors:
         """
@@ -56,7 +55,6 @@ class CustomException(Exception):
 class EventException(CustomException):
     def __init__(self, message_enum, errors=None):
         """
-
         :param (MessagesEnum) message_enum:
         :param errors:
         """
@@ -70,7 +68,6 @@ class EventException(CustomException):
 class ApiException(CustomException):
     def __init__(self, message_enum, errors=None):
         """
-
         :param (MessagesEnum) message_enum:
         :param errors:
         """
@@ -84,11 +81,10 @@ class ApiException(CustomException):
 class DatabaseException(ApiException):
     def __init__(self, message_enum, errors=None):
         """
-
         :param (MessagesEnum) message_enum:
         :param errors:
         """
-        super(ApiException, self).__init__(message_enum.message, errors)
+        super(ApiException, self).__init__(message_enum, errors)
         self.code = message_enum.code
         self.label = message_enum.label
         self.message = message_enum.message
@@ -98,11 +94,10 @@ class DatabaseException(ApiException):
 class FilterException(ApiException):
     def __init__(self, message_enum, errors=None):
         """
-
         :param (MessagesEnum) message_enum:
         :param errors:
         """
-        super(ApiException, self).__init__(message_enum.message, errors)
+        super(ApiException, self).__init__(message_enum, errors)
         self.code = message_enum.code
         self.label = message_enum.label
         self.message = message_enum.message
@@ -112,11 +107,10 @@ class FilterException(ApiException):
 class ValidationException(ApiException):
     def __init__(self, message_enum, errors=None):
         """
-
         :param (MessagesEnum) message_enum:
         :param errors:
         """
-        super(ApiException, self).__init__(message_enum.message, errors)
+        super(ApiException, self).__init__(message_enum, errors)
         self.code = message_enum.code
         self.label = message_enum.label
         self.message = message_enum.message

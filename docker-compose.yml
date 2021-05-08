@@ -1,0 +1,53 @@
+version: "3.2"
+services:
+  api-mock:
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    privileged: false
+    ports:
+      - 3000:3000
+    networks:
+      - default
+  aws-lambda-chalice-skeleton-python:
+    container_name: aws-lambda-chalice-skeleton-python
+    build:
+      context: .
+      dockerfile: ./docker/python/Dockerfile
+    privileged: true
+    ports:
+      - 8000:8000
+    networks:
+      - default
+    volumes:
+      - ./:/app
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+    networks:
+      - default
+  localstack:
+    image: localstack/localstack
+    privileged: true
+    ports:
+      - "4566:4566"
+      - "4567-4582:4567-4582"
+      - "9070:9070"
+      - "8080:8080"
+    environment:
+      SERVICES: sqs,lambda
+      DOCKER_HOST: unix:///var/run/docker.sock
+      # PORT_WEB_UI: 9070
+      LAMBDA_EXECUTOR: docker
+      DEBUG: 1
+      HOSTNAME_EXTERNAL: localstack
+    networks:
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/localstack:/tmp/localstack
+#networks:
+#  default:
+#    external: true
+

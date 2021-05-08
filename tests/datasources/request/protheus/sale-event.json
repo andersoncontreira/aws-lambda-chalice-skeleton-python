@@ -1,0 +1,13 @@
+{
+    "order_id": 123456,
+    "products": [
+        {
+            "sku": 123456,
+            "quantity": 5
+        },
+        {
+            "sku": 204060,
+            "quantity": 2
+        }
+    ]
+}

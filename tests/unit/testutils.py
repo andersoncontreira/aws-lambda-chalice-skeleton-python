@@ -4,11 +4,6 @@ import string
 import traceback
 import unittest
 
-from chalicelib.boot import init, register_vendor
-
-init()
-register_vendor()
-
 
 def random_string(string_length=10):
     """Generate a random string of fixed length """
@@ -23,18 +18,18 @@ def get_function_name(class_name=""):
     return fn_name
 
 
-class BaseUnitTest(unittest.TestCase):
+class BaseUnitTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pass
 
     """
-    Classe base para testes funcionais
+    Classe base para testes de unidade
     """
 
     def setUp(self):
         log_name = 'unit_test'
         log_filename = None
         log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        logging.basicConfig(format=log_format, filename=log_filename, level=logging.INFO)
+        logging.basicConfig(format=log_format, filename=log_filename, level=logging.DEBUG)
         self.logger = logging.getLogger(log_name)

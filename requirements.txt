@@ -1,2 +1,10 @@
 python-dotenv
 jsonformatter
+requests
+pytz
+redis
+pyyaml
+apispec
+marshmallow
+pymysql
+SQLAlchemy

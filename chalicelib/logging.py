@@ -23,9 +23,9 @@ def get_logger():
         _LOGGER = logger
     else:
         logger = _LOGGER
+
+    if logger.level == logging.NOTSET:
+        # if no set, try again
+        logger.level = get_log_level()
+
     return logger
-
-
-def get_logger_wrapper():
-    "Retornar uma classe que internamente tenha o log do sistema e do new relic"
-    pass
