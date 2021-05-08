@@ -1,0 +1,43 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  pre_build:
+    run-as: root
+    commands:
+      # Install Serverless Framework CLI and plugins
+      - curl -L -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.7.1/yq_linux_amd64 && chmod +x /usr/local/bin/yq
+      - npm install -g serverless $(yq eval '.plugins | join(" ")' serverless.yml)
+  build:
+    commands:
+      - echo Installing all requirements
+      - pip install -r ./requirements.txt
+      - pip install -r ./requirements-vendor.txt
+  post_build:
+    commands:
+      - echo Installing test requirements
+      - pip install -r ./requirements-tests.txt
+      - echo Running unit testes
+      - ./bin/tests/unit-coverage-no-report-html.sh
+      # Uninstall test dependencies
+      - pip uninstall -r requirements-tests.txt -y
+    finally:
+      - echo Generating package file
+      - serverless package --stage $ENVIRONMENT_NAME
+      - serverless sam export --output ./sam.yml
+      - ls .
+      # Deploy application
+      - aws cloudformation package --template-file sam.yml --s3-bucket $LAMBDA_DEPLOYMENT_BUCKET --s3-prefix $APP_NAME --output-template-file packaged.yml
+reports:
+  UnitTestsReports:
+    files:
+      - 'target/unit/clover.xml'
+    file-format: 'CLOVERXML'
+artifacts:
+  files:
+    - sam.json
+    - sam.yml
+    - packaged.yml
+    - appspec.yml
