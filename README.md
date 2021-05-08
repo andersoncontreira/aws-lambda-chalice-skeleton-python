@@ -70,8 +70,23 @@ Execute the follow command:
 ## Samples
 See the project samples in this folder [here](samples).
 
+## Tests
+Some information about tests:
+See: [https://martinfowler.com/articles/microservice-testing/#testing-progress-3](https://martinfowler.com/articles/microservice-testing/#testing-progress-3)
+
+### Tests application in this project
+- Unit tests - Logic validation with mocks;
+- Component tests - Validation with resources from docker images, using fixture resources to build the enviroment like: 
+  queues, nosql databases and relational databases;
+- Integration tests - Validation of integration with staging enviroment (write and read operations only).
+
+### Diagram ot exemplify the general idea
+![Test Strategies](docs/test-strategies.png)
+
+
 ## Running tests
 To run the unit tests of the project you can execute the follow command:
+
 
 First you need install the tests requirements:
  ```
