@@ -1,6 +1,10 @@
 import logging
+import os
 import unittest
 import warnings
+
+from chalicelib.boot import reset, load_dot_env, load_env
+from chalicelib.config import reset as reset_config, get_config
 
 
 class BaseComponentTestCase(unittest.TestCase):
@@ -25,3 +29,14 @@ class BaseComponentTestCase(unittest.TestCase):
         # ignora falso positivos
         # https://github.com/boto/boto3/issues/454
         warnings.filterwarnings("ignore", category=ResourceWarning, message="unclosed.*<ssl.SSLSocket.*>")
+
+        # reset config and env
+        reset()
+        reset_config()
+        # load integration
+        APP_TYPE = os.environ['APP_TYPE']
+        if APP_TYPE == 'Flask':
+            load_dot_env()
+        else:
+            load_env()
+        self.config = get_config()
