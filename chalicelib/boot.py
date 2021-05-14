@@ -2,10 +2,7 @@ import json
 import os
 import sys
 
-from dotenv import dotenv_values
-
 from chalicelib import APP_NAME
-from chalicelib.aws.secrets import Secrets
 
 if __package__:
     current_path = os.path.abspath(os.path.dirname(__file__)).replace('/' + str(__package__), '', 1)
@@ -61,6 +58,7 @@ def get_internal_logger():
 
 
 def load_dot_env(env='development', force=False):
+    from dotenv import dotenv_values
     # env default value
     if env is None:
         env = 'development'
@@ -85,21 +83,23 @@ def load_dot_env(env='development', force=False):
                 os.environ[k] = v
             _LOADED = True
         else:
-            # Try to load via secrets manager
-            result = load_secrets(env=env)
-            if result:
-                _LOADED = True
+            # try with development
+            if env == 'dev':
+                load_dot_env('development')
             else:
-                # try with development
-                if env == 'dev':
-                    load_dot_env('development')
-                logger.error('Unable to load config')
+                # Try to load via secrets manager
+                result = load_secrets(env=env)
+                if result:
+                    _LOADED = True
+                else:
+                    logger.error('Unable to load config')
 
     else:
         pass
 
 
 def load_secrets(env='staging'):
+    from chalicelib.aws.secrets import Secrets
     logger = get_internal_logger()
     result = False
 
