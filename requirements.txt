@@ -8,3 +8,7 @@ apispec
 marshmallow
 pymysql
 SQLAlchemy
+elasticsearch
+jsonschema
+python-logstash
+python-json-logger

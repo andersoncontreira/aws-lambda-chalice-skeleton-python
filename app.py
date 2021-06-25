@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import base64
+import logging
 import os
 # execute before other codes of app
 from chalicelib.boot import register_vendor
@@ -18,16 +19,19 @@ from chalice import Chalice, CustomAuthorizer
 config = get_config()
 # debug
 debug = helper.debug_mode()
-# logger
-logger = get_logger()
 # chalice app
 app = Chalice(app_name=APP_NAME, debug=debug)
-# override the log configs
-if not debug:
-    # override to the level desired
-    logger.level = get_log_level()
+# logger
+logger = get_logger()
 # override the log instance
 app.log = logger
+# log if debug mode is active
+logger.info("Debug Mode: {}".format(debug))
+# override the log configs
+if debug:
+    # override to the level desired
+    logger.level = logging.INFO
+
 
 # general vars
 APP_QUEUE = config.APP_QUEUE
@@ -37,8 +41,6 @@ APP_QUEUE = config.APP_QUEUE
 def index():
     body = {"app": '%s:%s' % (APP_NAME, APP_VERSION)}
     logger.info('Env: {} App Info: {}'.format(config.APP_ENV, body))
-    # Temporário para debug
-    logger.info('Env Vars: {}'.format(config.to_dict()))
     return http_helper.create_response(body=body, status_code=200)
 
 
